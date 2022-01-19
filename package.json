@@ -168,5 +168,10 @@
 		"form-data": "^4.0.0",
 		"node-fetch": "3.0",
 		"node-forge": "^1.2.1"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mizunashi-sh/eoj-helper"
+	},
+	"homepage": "https://github.com/mizunashi-sh/eoj-helper"
 }
