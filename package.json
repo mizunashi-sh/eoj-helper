@@ -1,0 +1,172 @@
+{
+	"name": "eoj-helper",
+	"displayName": "EOJ Helper",
+	"description": "EOJ辅助插件 for Visual Studio Code",
+	"keywords": ["eoj", "helper"],
+	"version": "1.0.0",
+	"publisher": "mizunashi",
+	"engines": {
+		"vscode": "^1.63.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"icon": "assets/img/icon.ico",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+		"configuration": {
+			"title": "EOJ Helper",
+			"properties": {
+				"eoj-helper.contestList": {
+					"title": "比赛/作业",
+					"type": "array",
+					"items": {
+						"type": "string",
+						"pattern": "https:\/\/acm.ecnu.edu.cn\/contest\/[0-9a-zA-Z]+(\/)?",
+						"patternErrorMessage": "请输入合法的URL"
+					},
+					"description": "在EOJ Helper中注册的比赛/作业",
+					"uniqueItems": true,
+					"readOnly": true
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "eoj-helper.login",
+				"title": "EOJ Helper: 登录",
+				"icon": "$(log-in)"
+			},
+			{
+				"command": "eoj-helper.logout",
+				"title": "EOJ Helper: 注销登录",
+				"icon": "$(log-out)"
+			},
+			{
+				"command": "eoj-helper.refresh-problems",
+				"title": "EOJ Helper: 刷新题目列表",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "eoj-helper.add-contest",
+				"title": "EOJ Helper: 添加比赛/作业",
+				"icon": "$(add)"
+			},
+			{
+				"command": "eoj-helper.remove-contest",
+				"title": "EOJ Helper: 删除比赛",
+				"icon": "$(remove)"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "eoj-helper",
+					"title": "EOJ Helper",
+					"icon": "assets/img/eoj.png"
+				}
+			]
+		},
+		"views": {
+			"eoj-helper": [
+				{
+					"id": "userInfo",
+					"name": "用户",
+					"visibility": "collapsed"
+				},
+				{
+					"id": "problemList",
+					"name": "题目"
+				},
+				{
+					"id": "contestList",
+					"name": "比赛/作业"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "eoj-helper.refresh-problems",
+					"when": "view==problemList",
+					"group": "navigation"
+				},
+				{
+					"command": "eoj-helper.add-contest",
+					"when": "view==contestList",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "eoj-helper.login",
+					"when": "view==userInfo && viewItem==not-login",
+					"group": "inline"
+				},
+				{
+					"command": "eoj-helper.logout",
+					"when": "view==userInfo && viewItem==username",
+					"group": "inline"
+				},
+				{
+					"command": "eoj-helper.remove-contest",
+					"when": "view==contestList && viewItem==contest",
+					"group": "inline"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "eoj-helper.refresh-problems",
+					"when": "never"
+				},
+				{
+					"command": "eoj-helper.add-contest",
+					"when": "never"
+				},
+				{
+					"command": "eoj-helper.remove-contest",
+					"when": "never"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"compile": "webpack",
+		"watch": "webpack --watch",
+		"package": "webpack --mode production --devtool hidden-source-map",
+		"compile-tests": "tsc -p . --outDir out",
+		"watch-tests": "tsc -p . -w --outDir out",
+		"pretest": "npm run compile-tests && npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.4",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "14.x",
+		"@types/node-fetch": "^3.0.3",
+		"@types/vscode": "^1.63.0",
+		"@typescript-eslint/eslint-plugin": "^5.1.0",
+		"@typescript-eslint/parser": "^5.1.0",
+		"@vscode/test-electron": "^1.6.2",
+		"eslint": "^8.1.0",
+		"glob": "^7.1.7",
+		"mocha": "^9.1.3",
+		"ts-loader": "^9.2.5",
+		"typescript": "^4.4.4",
+		"webpack": "^5.52.1",
+		"webpack-cli": "^4.8.0"
+	},
+	"dependencies": {
+		"cheerio": "^1.0.0-rc.10",
+		"fetch-blob": "^3.1.3",
+		"fetch-cookie": "^1.0.0",
+		"form-data": "^4.0.0",
+		"node-fetch": "3.0",
+		"node-forge": "^1.2.1"
+	}
+}
