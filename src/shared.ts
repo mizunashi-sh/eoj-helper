@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 var loginInfo = {
     isLogin: false,
     username: null,

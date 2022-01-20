@@ -1,6 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import { userInfo } from 'os';
 import * as vscode from 'vscode';
 import { UserInfoProvider } from './userProvider';
 import { login, logout } from './auth';
@@ -15,18 +12,10 @@ import { ContestInfo, ContestProvider } from './contestProvider';
 const shared = require('./shared');
 const cheerio = require('cheerio');
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
 	const userInfo = new UserInfoProvider();
 	const problemProvider = new ProblemProvider();
 	const contestProvider = new ContestProvider();
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 
 	let disposables: vscode.Disposable[] = [
 		vscode.window.registerTreeDataProvider('userInfo', userInfo),
@@ -42,76 +31,80 @@ export async function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand('eoj-helper.search-problem', searchProblem),
 		vscode.commands.registerCommand('eoj-helper.show-problem-detail', async function(node: ProblemNode) {
-			const problemDetailResponse = await fetch(node.url, {
-				method: 'GET',
-				headers: {
-					'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            		'Accept-Encoding': 'gzip, deflate, br',
-            		'Accept-Language': 'zh-CN,zh;q=0.9,ja;q=0.8',
-            		'Connection': 'keep-alive',
-            		'Host': 'acm.ecnu.edu.cn',
-					"Cookie": "csrftoken:"+shared.loginInfo.csrftoken+' ;sessionid='+shared.loginInfo.sessionid,
-            		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
-				}
-			});
-
-			const contents = await problemDetailResponse.text();
-			const $ = cheerio.load(contents);
-			const problemHeader = $('.problem-header').html();
-			const problemBody = $('.problem-body').html();
-			const formCsrfToken = $("[name='csrfmiddlewaretoken']").val();
-			
-			const problemFormCookie = await problemDetailResponse.headers.raw()['set-cookie'];
-			const cookieCsrfToken = getCookieByName('csrftoken', problemFormCookie[0]);
-
-			const panel = vscode.window.createWebviewPanel(
-				"problemView",
-        		"EOJ-题目详情",
-        		vscode.ViewColumn.Two,
-        		{
-            		enableScripts: true,
-        		}
-			);
-			panel.webview.html = getProblemView(node.name, problemHeader, problemBody, node.url);
-
-			panel.webview.onDidReceiveMessage(async function(message) {
-					switch (message.command) {
-						case 'code':
-							const quickPick = await vscode.window.createQuickPick();
-							quickPick.items = [new ExtensionPickItem<number>('新建文件',1), new ExtensionPickItem<number>('打开已有文件',2)];
-							quickPick.onDidHide(() => quickPick.dispose());
-							quickPick.onDidChangeSelection(function(selection) {
-								if(selection[0]) {
-									const value: number = (selection[0] as ExtensionPickItem<number>).value;
-									switch(value) {
-										case 1:
-											vscode.workspace.openTextDocument().then(doc => {
-												vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-											});
-											break;
-										case 2:
-											vscode.window.showOpenDialog().then(uri => {
-												if(uri !== undefined && uri.length >= 1) {
-													vscode.workspace.openTextDocument(uri[0]).then(doc => {
-														vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-													});
-												}
-											});
-											break;
-									}
-								}
-								quickPick.hide();
-							});
-							quickPick.show();
-							break;
-						case 'submit':
-							vscode.commands.executeCommand('eoj-helper.submit', cookieCsrfToken, formCsrfToken, node);
-							break;
+			await vscode.window.withProgress({location: vscode.ProgressLocation.Notification}, async (p: vscode.Progress<{}>) => {
+                const message = "正在获取题目详情...";
+                p.report({message});
+                const problemDetailResponse = await fetch(node.url, {
+					method: 'GET',
+					headers: {
+						'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+						'Accept-Encoding': 'gzip, deflate, br',
+						'Accept-Language': 'zh-CN,zh;q=0.9,ja;q=0.8',
+						'Connection': 'keep-alive',
+						'Host': 'acm.ecnu.edu.cn',
+						"Cookie": "csrftoken:"+shared.loginInfo.csrftoken+' ;sessionid='+shared.loginInfo.sessionid,
+						'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
 					}
-				},
-				undefined,
-				context.subscriptions
-			);
+				});
+	
+				const contents = await problemDetailResponse.text();
+				const $ = cheerio.load(contents);
+				const problemHeader = $('.problem-header').html();
+				const problemBody = $('.problem-body').html();
+				const formCsrfToken = $("[name='csrfmiddlewaretoken']").val();
+				
+				const problemFormCookie = await problemDetailResponse.headers.raw()['set-cookie'];
+				const cookieCsrfToken = getCookieByName('csrftoken', problemFormCookie[0]);
+	
+				const panel = vscode.window.createWebviewPanel(
+					"problemView",
+					"EOJ-题目详情",
+					vscode.ViewColumn.Two,
+					{
+						enableScripts: true,
+					}
+				);
+				panel.webview.html = getProblemView(node.name, problemHeader, problemBody, node.url);
+	
+				panel.webview.onDidReceiveMessage(async function(message) {
+						switch (message.command) {
+							case 'code':
+								const quickPick = await vscode.window.createQuickPick();
+								quickPick.items = [new ExtensionPickItem<number>('新建文件',1), new ExtensionPickItem<number>('打开已有文件',2)];
+								quickPick.onDidHide(() => quickPick.dispose());
+								quickPick.onDidChangeSelection(function(selection) {
+									if(selection[0]) {
+										const value: number = (selection[0] as ExtensionPickItem<number>).value;
+										switch(value) {
+											case 1:
+												vscode.workspace.openTextDocument().then(doc => {
+													vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+												});
+												break;
+											case 2:
+												vscode.window.showOpenDialog().then(uri => {
+													if(uri !== undefined && uri.length >= 1) {
+														vscode.workspace.openTextDocument(uri[0]).then(doc => {
+															vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+														});
+													}
+												});
+												break;
+										}
+									}
+									quickPick.hide();
+								});
+								quickPick.show();
+								break;
+							case 'submit':
+								vscode.commands.executeCommand('eoj-helper.submit', cookieCsrfToken, formCsrfToken, node);
+								break;
+						}
+					},
+					undefined,
+					context.subscriptions
+				);
+            });
 		}),
 		vscode.commands.registerCommand('eoj-helper.submit', (cookieCsrfToken: string, formCsrfToken: string, node: ProblemNode) => submitProblem(cookieCsrfToken, formCsrfToken, node)),
 		vscode.commands.registerCommand('eoj-helper.add-contest', addContest),
@@ -184,9 +177,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	vscode.commands.executeCommand('eoj-helper.refresh-contests');
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {
-	logout();
-}
+export function deactivate() {}
 
 
