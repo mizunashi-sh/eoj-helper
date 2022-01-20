@@ -230,7 +230,7 @@ export async function submitProblem(cookieCsrfToken: string, formCsrfToken: stri
                     });
                     const judgeContent = await judgeResponse.text();
                     const $ = cheerio.load(judgeContent);
-                    const judgeResultHTML = $('body').html();
+                    const judgeResultHTML = $('table:first').html();
 
                     const panel = vscode.window.createWebviewPanel(
                         "judgeView",

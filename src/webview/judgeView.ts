@@ -1,4 +1,4 @@
-export function getJudgeView(body: string) {
+export function getJudgeView(table: string) {
     return `<html>
                 <head>
                     <meta charset="UTF-8">
@@ -6,7 +6,7 @@ export function getJudgeView(body: string) {
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
                     <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
                 </head>
-                <body>${body}<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+                <body><table class="ui celled table structured">${table}</table><script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
                 <script>
                     STATUS = {};
                     STATUS[-4] = 'Submitted';
