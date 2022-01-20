@@ -48,6 +48,6 @@ export function getProblemView(title: string, head: string, body: string, url: s
                         };
                     </script>
                     <script src="https://acm.ecnu.edu.cn/static/js/app.js?v=1620609533"></script>
-                    <script src="https://acm.ecnu.edu.cn/static/node_modules/mathjax/es5/tex-chtml-full.js"></script>
+                    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
                 </body>`;
 }
