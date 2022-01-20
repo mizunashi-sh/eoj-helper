@@ -29,20 +29,13 @@ export function getProblemView(title: string, head: string, body: string, url: s
                         }
                     </script>
                     <script>
-                        $(".sample-content").click(function() {
-                            copyToClipboard($(this)[0].textContent);
-                        })
-                    </script>
-                    <script>
                         MathJax = {
                             tex: {
                                 inlineMath: [
-                                    ['\\(', '\\)'],
                                     ['$', '$']
                                 ],
                                 displayMath: [
                                     ['$$', '$$'],
-                                    ['\\[', '\\]']
                                 ],
                             }
                         };
