@@ -3,7 +3,7 @@
 	"displayName": "EOJ Helper",
 	"description": "EOJ辅助插件 for Visual Studio Code",
 	"keywords": ["eoj", "helper"],
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "mizunashi",
 	"engines": {
 		"vscode": "^1.63.0"
