@@ -109,7 +109,7 @@ async function getProblemByContest(contestUrl: string) {
     const $ = cheerio.load(problemList);
 
     var tableItems: any[] = [];
-    $('table:contains(#) tr').each(function(this: any){ 
+    $('table:first').find('tr').each(function(this: any){ 
         var idItem = $(this).find('td').eq(0).text();
         var titleLinkItem = $(this).find('td').eq(1).html();
         tableItems.push({
