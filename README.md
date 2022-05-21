@@ -1,6 +1,8 @@
 # EOJ Helper
 一个适用于VSCode的[EOJ](https://acm.ecnu.edu.cn/)辅助插件
 
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Mizunashi.eoj-helper)
+
 ![](https://mizunashi.me/image-hosting/projects/eoj-helper/demo.png)
 
 ## 使用方法
